@@ -1,5 +1,5 @@
 import type { PropsWithChildren, ReactElement } from 'react';
-import { StyleSheet, Button } from 'react-native';
+import { StyleSheet, Button, ViewStyle } from 'react-native';
 import Animated, {
   interpolate,
   useAnimatedRef,
@@ -10,18 +10,19 @@ import Animated, {
 import { ThemedView } from '@/components/ThemedView';
 import { useBottomTabOverflow } from '@/components/ui/TabBarBackground';
 import { useColorScheme } from '@/hooks/useColorScheme';
+import { ThemedText } from './ThemedText';
 
-const HEADER_HEIGHT = 250;
+const HEADER_HEIGHT = 150;
 
 type Props = PropsWithChildren<{
-  headerImage: ReactElement;
-  headerBackgroundColor: { dark: string; light: string };
+    title : string,
+    backgroundColor : string;
 }>;
 
 export default function ParallaxScrollView({
+    title,
   children,
-  headerImage,
-  headerBackgroundColor,
+  backgroundColor
 }: Props) {
   const colorScheme = useColorScheme() ?? 'light';
   const scrollRef = useAnimatedRef<Animated.ScrollView>();
@@ -46,22 +47,16 @@ export default function ParallaxScrollView({
 
   return (
     <ThemedView style={styles.container}>
-      <Animated.ScrollView
-        ref={scrollRef}
-        scrollEventThrottle={16}
-        scrollIndicatorInsets={{ bottom }}
-        contentContainerStyle={{ paddingBottom: bottom }}>
-        <Animated.View
-          style={[
-            styles.header,
-            { backgroundColor: headerBackgroundColor[colorScheme] },
-            headerAnimatedStyle,
-          ]}>
-          {headerImage}
-          <Button title='edit'></Button>
-        </Animated.View>
-        <ThemedView style={styles.content}>{children}</ThemedView>
-      </Animated.ScrollView>
+        <ThemedView style={[styles.header, {backgroundColor} as ViewStyle]}>
+                <ThemedText type='title'>{title}</ThemedText>
+        </ThemedView>
+        <Animated.ScrollView
+            ref={scrollRef}
+            scrollEventThrottle={16}
+            scrollIndicatorInsets={{ bottom }}
+            contentContainerStyle={{ paddingBottom: bottom }}>
+            <ThemedView style={styles.content}>{children}</ThemedView>
+        </Animated.ScrollView>
     </ThemedView>
   );
 }
@@ -71,10 +66,11 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   header: {
-    height: 200,
-    overflow: 'hidden',
+    backgroundColor : 'white',
     justifyContent: 'flex-end',
-    paddingRight : 1
+    padding : 20,
+    height: HEADER_HEIGHT,
+    overflow: 'hidden',
   },
   content: {
     flex: 1,
